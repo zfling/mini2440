@@ -1,29 +1,66 @@
-/**
- *@brief  :led打开的C主函数
- *
- *@note   :
- *
- *@params :
- *
- *@return :
- *
- *@author : zhongfulin
- *@email  : 460342522@qq.com
- *@date   : 2018-9-8
- *
- */
+#include "led.h"
 
-#define GPFCON (*(volatile unsigned long *)0x56000010)
-#define GPFDAT (*(volatile unsigned long *)0x56000014)
-
-int main()
+void led_init(void)
 {
-	//GPF7-GPF4 2bits
-	GPFCON &= ~((3<<10)|(3<<12)|(3<<14)|(3<<16));
-	GPFCON |= (1<<10)|(1<<12)|(1<<14)|(1<<16);
-	//1bit
-	GPFDAT &= ~(0xF<<5);
-	GPFDAT |= (1<<5)|(1<<7);
+	//设置LED对应的GPIO引脚为输出功能
+	LEDCON &= ~((0x3<<(2*BITLED1))|(0x3<<(2*BITLED2))|(0x3<<(2*BITLED3))|(0x3<<(2*BITLED4)));
+	LEDCON |= (0x1<<(2*BITLED1))|(0x1<<(2*BITLED2))|(0x1<<(2*BITLED3))|(0x1<<(2*BITLED4));
 
-	return 0;
+	return;
 }
+
+static void led_set_data(enBitLED bitLed, enLedStatus status) 
+{
+	if (status >= LED_ERROR) {
+		//输入状态有问题，只有ONheOFF两种状态
+		return;
+	}
+	if ( bitLed >= BIT_ERROR)
+	{
+		//bit位有问题
+	    return;
+	}
+
+	LEDDAT &= ~(0x1<<bitLed); //清除对应为，设置为0
+	if ( LED_OFF == status )
+	{
+	    LEDDAT |= 0x1<<bitLed;
+	}
+	
+	return;
+}
+
+void led1_status(enLedStatus status)
+{
+	
+	led_set_data(BITLED1, status);
+	return;
+}
+
+void led2_status(enLedStatus status)
+{
+	led_set_data(BITLED2, status);
+	return;
+}
+
+void led3_status(enLedStatus status)
+{
+	led_set_data(BITLED3, status);
+	return;
+}
+
+void led4_status(enLedStatus status)
+{
+	led_set_data(BITLED4, status);
+	return;
+}
+
+void led_status(enLedStatus status)
+{
+	led_set_data(BITLED4, status);
+	led_set_data(BITLED3, status);
+	led_set_data(BITLED2, status);
+	led_set_data(BITLED1, status);
+	return;
+}
+

@@ -12,10 +12,11 @@
  *@date   : 2018-9-8
  *
  */
+#include "config.h"
 
 .global _start
 _start:
-	ldr r0, =0x53000000
+	ldr r0, =WTCON
 	mov r1, #0x0
 	str r1, [r0] @写入0，禁止WATCHDOG，否则CPU会不断重启
 
