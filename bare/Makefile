@@ -1,8 +1,37 @@
-led_on.bin : crt0.S led_on.c
-	arm-linux-gcc -g -c -o crt0.o crt0.S
-	arm-linux-gcc -g -c -o led_on.o led_on.c
-	arm-linux-ld -Ttext 0x00000000 -g crt0.o led_on.o -o led_on_elf
-	arm-linux-objcopy -O binary -S led_on_elf led_on.bin
-	arm-linux-objdump -D -m arm led_on_elf > led_on.dis
-clean:
-	rm -f led_on.dis led_on.bin led_on_elf *.o 
+
+
+TOPDIR := $(CURDIR)
+export TOPDIR
+obj := $(CURDIR)/
+export obj
+include config.mk
+
+OBJS = start.o
+OBJS := $(addprefix $(obj),$(OBJS))
+# 子目录
+LIBS = led/libled.a
+LIBS += nandflash/libnandflash.a
+
+LIBS := $(addprefix $(obj),$(LIBS))
+
+# 暂时使用删除libxxx.a的方法使改变某个源文件重新生成静态库生效
+all : delete_liba target
+	
+
+$(LIBS) :
+	$(MAKE) -C $(dir $(subst $(obj),,$@))
+
+target : $(LIBS) start.o main.o
+	@echo "进行到这里，2018-09-10"
+	
+delete_liba : 
+	@$(foreach N,$(dir $(subst $(obj),,$(LIBS))),rm -f $(N)*.a;)
+	
+clean : 
+	@$(foreach N,$(dir $(subst $(obj),,$(LIBS))),rm -f $(N)*.a $(N)*.o;)
+	@rm -f start.o main.o
+	
+%.o : %.S
+	$(CC) $(CPPFLAGS) -o $@ $<
+%.o : %.c $(INCLUDES)/led.h
+	$(CC) $(CPPFLAGS) -o $@ $<

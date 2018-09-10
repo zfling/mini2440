@@ -17,22 +17,23 @@
 
 #include "config.h"
 
-enum enLedStatus {
+typedef enum {
 	LED_ON = 0,
 	LED_OFF,
 	LED_ERROR
-};
+}enLedStatus;
+
 
 #define LEDCON (*(volatile unsigned long *)GPFCON)
 #define LEDDAT (*(volatile unsigned long *)GPFDAT)
 
-enum enBitLED {
+typedef enum {
 	BITLED1 = 5,
 	BITLED2,
 	BITLED3,
 	BITLED4,
 	BIT_ERROR
-};
+}enBitLED;
 
 void led_init(void);
 void led1_status(enLedStatus);

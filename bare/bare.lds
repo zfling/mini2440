@@ -20,9 +20,12 @@ SECTIONS
 	.data : {
 		*(.data*)        /*指定数据段*/
 	}
-
+	
+	. = ALIGN(4);
+	.got : { *(.got) }
+	
 	. = ALIGN(4);
 	__bss_start = .;     /*把__bss_start赋值为当前位置,即bss段的开始位置*/
-	.bss : { *(.bss) . = ALIGN(4); }  /*指定bss段,告诉加载器不要加载这个段*/
-	__bss_end = .;       /*把_end赋值为当前位置,即bss段的结束位置*/
+	.bss (NOLOAD) : { *(.bss) . = ALIGN(4); }  /*指定bss段,告诉加载器不要加载这个段*/
+	_end = .;       /*把_end赋值为当前位置,即bss段的结束位置*/
 }
